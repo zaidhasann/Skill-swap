@@ -1,0 +1,34 @@
+/* ===== HORIZONTAL AUTO SCROLL ===== */
+
+.scroll-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  margin-top: 2rem;
+}
+
+.scroll-track {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: scroll-left 35s linear infinite;
+}
+
+/* pause on hover */
+.scroll-wrapper:hover .scroll-track {
+  animation-play-state: paused;
+}
+
+.scroll-card {
+  min-width: 280px;
+}
+
+/* animation */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
