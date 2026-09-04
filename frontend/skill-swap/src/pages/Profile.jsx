@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { getSkills } from "../api/skillApi";
 import Avatar from "../components/Avatar";
 import { useAuth } from "../context/AuthContext";
-import bgProfile from "../assets/bgprofile.png"; 
+import SkillChip from "../components/SkillChip";
 
 export default function Profile() {
-  const { id } = useParams();           // userId from URL
-  const { user } = useAuth();           // logged-in user
+  const { id } = useParams();
+  const { user } = useAuth();
   const [mySkills, setMySkills] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -15,107 +15,147 @@ export default function Profile() {
     (async () => {
       try {
         const all = await getSkills();
-
-        // ✅ filter skills by owner
         const filtered = all.filter(
           (s) => s.owner === id || s.owner?._id === id
         );
-
         setMySkills(filtered);
       } catch (err) {
-        console.error("Failed to load skills");
+        console.error("Failed to load profile skills", err);
       } finally {
         setLoading(false);
       }
     })();
   }, [id]);
 
+  const displayName = user?.name || "Community Member";
+
   return (
-    <section
-      style={{
-        minHeight: "100vh",
-        background: "#f5f7fb",
-        padding: "2rem",
-        display: "flex",
-        justifyContent: "center",
-        backgroundImage: `url(${bgProfile})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-        
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: 900 }}>
-        {/* Profile Header */}
-        <div
-          style={{
-            background: "#ffffff",
-            padding: "1.5rem",
-            borderRadius: 12,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-            marginBottom: "2rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "1rem",
-          }}
-        >
-          {/* Avatar */}
-          <Avatar name={user?.name || "User"} />
+    <div className="page-container" style={{ maxWidth: 900 }}>
+      {/* Profile Summary Card */}
+      <div
+        className="card"
+        style={{
+          padding: "2rem",
+          marginBottom: "2rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "1.5rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <Avatar name={displayName} size={68} />
 
-          <div>
-            <h2 style={{ marginBottom: "0.25rem" }}>
-              {user?.name || "User Profile"}
-            </h2>
-            <p style={{ color: "#666", fontSize: 14 }}>
-              User ID: <strong>{id}</strong>
-            </p>
-          </div>
-        </div>
-
-        {/* Skills Section */}
-        <div
-          style={{
-            background: "#ffffff",
-            padding: "1.5rem",
-            borderRadius: 12,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-          }}
-        >
-          <h3 style={{ marginBottom: "1rem" }}>Skills Offered</h3>
-
-          {loading ? (
-            <p>Loading skills...</p>
-          ) : mySkills.length ? (
-            <div
+        <div style={{ flex: 1, minWidth: "240px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-text-primary)", margin: 0 }}>
+              {displayName}
+            </h1>
+            <span
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-                gap: "1rem",
+                fontSize: "0.72rem",
+                fontWeight: 600,
+                padding: "0.2rem 0.55rem",
+                borderRadius: "var(--radius-pill)",
+                backgroundColor: "var(--color-success-bg)",
+                color: "var(--color-success-text)",
+                border: "1px solid var(--color-success-border)",
               }}
             >
-              {mySkills.map((s) => (
-                <div
-                  key={s._id || s.id}
-                  style={{
-                    padding: "1rem",
-                    borderRadius: 10,
-                    border: "1px solid #e5e7eb",
-                    background: "#fafafa",
-                  }}
-                >
-                  <h4 style={{ marginBottom: "0.5rem" }}>{s.title}</h4>
-                  <p style={{ fontSize: 14, color: "#555" }}>
-                    {s.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p style={{ color: "#777", fontSize: 14 }}>
-              No skills added yet.
-            </p>
-          )}
+              Verified Member
+            </span>
+          </div>
+
+          <p style={{ color: "var(--color-text-muted)", fontSize: "0.85rem", margin: "0 0 0.75rem 0" }}>
+            Member Identifier: <code style={{ color: "var(--color-text-secondary)", fontSize: "0.8rem" }}>{id}</code>
+          </p>
+
+          <div style={{ display: "flex", gap: "1rem", fontSize: "0.85rem", color: "var(--color-text-secondary)" }}>
+            <span><strong>{mySkills.length}</strong> Skills Shared</span>
+            <span>•</span>
+            <span style={{ color: "var(--color-accent-emerald)" }}>Active in Community</span>
+          </div>
         </div>
       </div>
-    </section>
+
+      {/* Skills Offered Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+        <div>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-primary)" }}>
+            Skills Offered for Exchange
+          </h2>
+          <p style={{ fontSize: "0.875rem", color: "var(--color-text-secondary)" }}>
+            Competencies available for peer learning barter.
+          </p>
+        </div>
+
+        {user && (user._id === id || user.id === id) && (
+          <Link to="/post" className="btn-primary" style={{ padding: "0.45rem 0.95rem", fontSize: "0.85rem" }}>
+            + Offer Skill
+          </Link>
+        )}
+      </div>
+
+      {/* Skills Grid */}
+      {loading ? (
+        <div className="grid">
+          <div style={{ height: "140px" }} className="skeleton" />
+          <div style={{ height: "140px" }} className="skeleton" />
+        </div>
+      ) : mySkills.length > 0 ? (
+        <div className="grid">
+          {mySkills.map((s) => (
+            <div
+              key={s._id || s.id}
+              className="card"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                padding: "1.5rem",
+              }}
+            >
+              <div>
+                <div style={{ marginBottom: "0.5rem" }}>
+                  <SkillChip label={s.category || "Skill"} />
+                </div>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--color-text-primary)", marginBottom: "0.5rem" }}>
+                  {s.title}
+                </h3>
+                <p style={{ fontSize: "0.875rem", color: "var(--color-text-secondary)", lineHeight: 1.55 }}>
+                  {s.description}
+                </p>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "1.25rem",
+                  paddingTop: "0.75rem",
+                  borderTop: "1px solid var(--color-border-subtle)",
+                  fontSize: "0.78rem",
+                  color: "var(--color-accent-emerald)",
+                  fontWeight: 600,
+                }}
+              >
+                Available for Barter
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <div className="empty-state-icon">🌱</div>
+          <h3 className="empty-state-title">No skill offerings published yet</h3>
+          <p className="empty-state-desc">
+            This member has not yet published any active skills for reciprocal exchange.
+          </p>
+          {user && (user._id === id || user.id === id) && (
+            <Link to="/post" className="btn-primary">
+              Post a Skill Offering
+            </Link>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
+

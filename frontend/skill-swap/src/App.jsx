@@ -53,13 +53,13 @@ export default function App() {
           />
 
           <Route
-       path="/chat/:requestId"
-       element={
-      <ProtectedRoute>
-        <Chat/>
-      </ProtectedRoute>
-  }
-/>
+            path="/chat/:requestId"
+            element={
+              <ProtectedRoute>
+                <Chat />
+              </ProtectedRoute>
+            }
+          />
 
 
           <Route path="*" element={<NotFound />} />

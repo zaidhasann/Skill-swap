@@ -24,5 +24,7 @@ export const login = async (req, res) => {
     expiresIn: "1d",
   });
 
-  res.json({ token, user });
+  const safeUser = await User.findById(user._id).select("-password");
+
+  res.json({ token, user: safeUser });
 };

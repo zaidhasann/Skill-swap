@@ -2,10 +2,9 @@ import { useState } from "react";
 import { postSkill } from "../api/skillApi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import bgPost from "../assets/bgpost.png"; 
 
 export default function PostSkill() {
-  const { user } = useAuth();          // ✅ auth check
+  const { user } = useAuth();
   const nav = useNavigate();
 
   const [title, setTitle] = useState("");
@@ -23,131 +22,129 @@ export default function PostSkill() {
       return;
     }
 
-    if (!title || !description || !category) {
+    if (!title.trim() || !description.trim() || !category) {
       setError("All fields are required.");
       return;
     }
 
     try {
       setLoading(true);
-      await postSkill({ title, description, category });
+      await postSkill({ title: title.trim(), description: description.trim(), category });
       nav("/browse");
     } catch (err) {
-      setError("Failed to post skill. Please try again.");
+      setError("Failed to publish skill offering. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section
-      style={{
-        minHeight: "100vh",
-        background: "#f5f7fb",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "2rem",
-        
-                    backgroundImage: `url(${bgPost})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 500,
-          background: "#ffffff",
-          padding: "2rem",
-          borderRadius: 14,
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-        }}
-      >
-        <h2 style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-          Post a New Skill ✨
-        </h2>
+    <div className="page-container" style={{ maxWidth: 640 }}>
+      <div className="page-header" style={{ textAlign: "center", marginBottom: "2rem" }}>
+        <span
+          style={{
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            color: "var(--color-accent-emerald)",
+            display: "block",
+            marginBottom: "0.25rem",
+          }}
+        >
+          Knowledge Barter
+        </span>
+        <h1 className="page-title">Offer a Skill to the Community</h1>
+        <p className="page-subtitle">
+          Describe what you can teach. You will be matched with learners offering reciprocal skills.
+        </p>
+      </div>
 
+      <div className="card" style={{ padding: "2.25rem" }}>
         <form onSubmit={handleSubmit}>
           {/* Skill Title */}
-          <div style={{ marginBottom: "1rem" }}>
-            <label style={{ fontWeight: 500 }}>Skill Title</label>
+          <div style={{ marginBottom: "1.25rem" }}>
+            <label htmlFor="skill-title">Skill Headline / Title</label>
             <input
+              id="skill-title"
               type="text"
-              placeholder="e.g. Web Development"
+              placeholder="e.g. Practical UI Systems & Design Architecture"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              style={inputStyle}
+              required
             />
           </div>
 
           {/* Category */}
-          <div style={{ marginBottom: "1rem" }}>
-            <label style={{ fontWeight: 500 }}>Category</label>
+          <div style={{ marginBottom: "1.25rem" }}>
+            <label htmlFor="skill-category">Field / Category</label>
             <select
+              id="skill-category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              style={inputStyle}
+              required
             >
-              <option value="">Select category</option>
-              <option value="Programming">Programming</option>
-              <option value="Design">Design</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Content">Content</option>
-              <option value="Other">Other</option>
+              <option value="">Select a primary domain</option>
+              <option value="Programming">Programming & Software</option>
+              <option value="Design">Product Design & UI/UX</option>
+              <option value="Marketing">Growth & Marketing</option>
+              <option value="Content">Writing & Content Strategy</option>
+              <option value="Other">Other Specialized Discipline</option>
             </select>
           </div>
 
           {/* Description */}
-          <div style={{ marginBottom: "1.2rem" }}>
-            <label style={{ fontWeight: 500 }}>Description</label>
+          <div style={{ marginBottom: "1.5rem" }}>
+            <label htmlFor="skill-description">Exchange Description</label>
             <textarea
-              placeholder="Describe your skill in detail..."
+              id="skill-description"
+              placeholder="Provide context on your depth of experience, what formats you prefer (e.g. code reviews, paired sessions), and what topics you can cover in depth..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              style={{ ...inputStyle, resize: "none" }}
+              rows={5}
+              style={{ resize: "vertical" }}
+              required
             />
           </div>
 
-          {/* Error */}
+          {/* Error Message */}
           {error && (
-            <p style={{ color: "red", fontSize: 13, marginBottom: 10 }}>
+            <div
+              style={{
+                padding: "0.75rem",
+                borderRadius: "var(--radius-sm)",
+                backgroundColor: "var(--color-danger-bg)",
+                border: "1px solid var(--color-danger-border)",
+                color: "var(--color-danger-text)",
+                fontSize: "0.875rem",
+                marginBottom: "1.25rem",
+              }}
+            >
               {error}
-            </p>
+            </div>
           )}
 
-          {/* Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "0.8rem",
-              borderRadius: 8,
-              border: "none",
-              background: loading ? "#9ca3af" : "#4f46e5",
-              color: "#fff",
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-          >
-            {loading ? "Posting..." : "Post Skill"}
-          </button>
+          {/* Action Buttons */}
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary"
+              style={{ flex: 1, padding: "0.75rem" }}
+            >
+              {loading ? "Publishing Offering..." : "Publish Skill Offering"}
+            </button>
+            <button
+              type="button"
+              onClick={() => nav(-1)}
+              className="btn-ghost"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
-    </section>
+    </div>
   );
 }
 
-const inputStyle = {
-  width: "100%",
-  marginTop: 6,
-  padding: "10px",
-  borderRadius: 6,
-  border: "1px solid #d1d5db",
-  outline: "none",
-  fontSize: 14,
-};

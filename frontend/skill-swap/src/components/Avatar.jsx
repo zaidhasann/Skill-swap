@@ -1,9 +1,11 @@
-export default function Avatar({ name, size = 60 }) {
+export default function Avatar({ name, size = 44 }) {
   const initials = name
     ?.split(" ")
+    .filter(Boolean)
     .map(n => n[0])
+    .slice(0, 2)
     .join("")
-    .toUpperCase();
+    .toUpperCase() || "U";
 
   return (
     <div
@@ -11,16 +13,20 @@ export default function Avatar({ name, size = 60 }) {
         width: size,
         height: size,
         borderRadius: "50%",
-        background: "#4f46e5",
-        color: "#fff",
-        display: "flex",
+        backgroundColor: "var(--color-accent-soft)",
+        color: "var(--color-brand-primary)",
+        border: "1px solid var(--color-accent-border)",
+        display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         fontWeight: 600,
-        fontSize: size / 2.5,
+        fontSize: Math.max(12, Math.round(size / 2.6)),
+        userSelect: "none",
+        flexShrink: 0,
       }}
     >
       {initials}
     </div>
   );
 }
+
