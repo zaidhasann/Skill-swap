@@ -7,8 +7,8 @@ RUN npm ci
 
 COPY . .
 
-ARG VITE_API_BASE_URL=http://localhost:5000/api
-ARG VITE_SOCKET_URL=http://localhost:5000
+ARG VITE_API_BASE_URL=https://skill-swap-backend-ew5e.onrender.com/api
+ARG VITE_SOCKET_URL=https://skill-swap-backend-ew5e.onrender.com
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ENV VITE_SOCKET_URL=$VITE_SOCKET_URL
 
